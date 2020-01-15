@@ -2,9 +2,7 @@ package com.gl.loggly.glbook.model;
 
 import lombok.*;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
 
 @Setter
 @Getter

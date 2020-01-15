@@ -1,4 +1,4 @@
-package com.gl.loggly.glbookinfo.model;
+package com.gl.loggly.glbook.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document
-public class BookInfo {
+@Document(collection = "bookCustomSequences")
+public class BookCustomSequences {
     @Id
-    private long bookInfoId;
-    private String bookInfo;
-    private long bookId;
+    private String id;
+    private int seq;
+
+// getters and setters
 }

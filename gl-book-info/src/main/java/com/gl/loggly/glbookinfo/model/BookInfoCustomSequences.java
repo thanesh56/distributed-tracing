@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document
-public class BookInfo {
+@Document(collection = "bookInfoCustomSequences")
+public class BookInfoCustomSequences {
     @Id
-    private long bookInfoId;
-    private String bookInfo;
-    private long bookId;
+    private String id;
+    private int seq;
+
+
 }

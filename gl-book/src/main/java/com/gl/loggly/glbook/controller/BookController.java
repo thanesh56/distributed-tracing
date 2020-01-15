@@ -5,6 +5,7 @@ import com.gl.loggly.glbook.model.Author;
 import com.gl.loggly.glbook.model.Book;
 import com.gl.loggly.glbook.model.BookInfo;
 import com.gl.loggly.glbook.model.BookItem;
+import com.gl.loggly.glbook.service.NextSequenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ClientHttpRequest;
@@ -22,6 +23,9 @@ import java.util.List;
 public class BookController {
     @Autowired
     BookDao bookDao;
+
+    @Autowired
+    NextSequenceService nextSequenceService;
 
     @Autowired
     WebClient.Builder webClientBuilder;     //for communicating with another microservice
@@ -51,6 +55,7 @@ public class BookController {
     @PostMapping(path = "/")
     public ResponseEntity<Book> addBook(@RequestBody Book book){
         BookItem bookItem = new BookItem();
+        bookItem.setBookId(nextSequenceService.getNextSequence("bookCustomSequences"));
         bookItem.setBookName(book.getName());
         bookItem = bookDao.saveBookItem(bookItem);
 
@@ -81,8 +86,5 @@ public class BookController {
                 .block();
         return  ResponseEntity.ok(new Book(book.getName(),bookInfo.getBookInfo(),author.getAuthorName()));
     }
-
-
-
 
 }
