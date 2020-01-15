@@ -16,4 +16,9 @@ public class AuthorDaoImpl implements AuthorDao {
     public Author getAuthorByBookId(long id) {
         return authorRepository.findAuthorByBookId(id);
     }
+
+    @Override
+    public Author saveAuthor(Author author) {
+        return authorRepository.save(author);
+    }
 }

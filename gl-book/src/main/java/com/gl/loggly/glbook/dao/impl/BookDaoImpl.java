@@ -16,4 +16,9 @@ public class BookDaoImpl implements BookDao {
     public Long getBookIdByBookName(String bookName) {
         return bookRepository.findBookIdByBookName(bookName);
     }
+
+    @Override
+    public BookItem saveBookItem(BookItem bookItem) {
+        return bookRepository.save(bookItem);
+    }
 }

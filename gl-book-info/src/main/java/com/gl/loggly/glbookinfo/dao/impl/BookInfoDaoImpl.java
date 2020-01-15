@@ -14,4 +14,9 @@ public class BookInfoDaoImpl implements BookInfoDao {
     public BookInfo getBookInfoByBookId(long id) {
         return bookInfoRepository.findBookInfoByBookId(id);
     }
+
+    @Override
+    public BookInfo saveBookInfo(BookInfo bookInfo) {
+        return bookInfoRepository.save(bookInfo);
+    }
 }

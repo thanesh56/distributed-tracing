@@ -7,10 +7,10 @@ import com.gl.loggly.glbook.model.BookInfo;
 import com.gl.loggly.glbook.model.BookItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.client.reactive.ClientHttpRequest;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
@@ -43,13 +43,43 @@ public class BookController {
                 .retrieve()
                 .bodyToMono(BookInfo.class)
                 .block();
+        return  ResponseEntity.ok(new Book(bookName,bookInfo.getBookInfo(),author.getAuthorName()));
+    }
 
 
 
+    @PostMapping(path = "/")
+    public ResponseEntity<Book> addBook(@RequestBody Book book){
+        BookItem bookItem = new BookItem();
+        bookItem.setBookName(book.getName());
+        bookItem = bookDao.saveBookItem(bookItem);
 
 
+        Author author = new Author();
+        author.setAuthorName(book.getAuthor());
+        author.setBookId(bookItem.getBookId());
 
-        return  ResponseEntity.ok(new Book("Java",bookInfo.getBookInfo(),author.getAuthorName()));
+         author =  webClientBuilder.build()
+                .post()
+                .uri("http://localhost:8020/author/")
+                .bodyValue( author)
+                .retrieve()
+                .bodyToMono(Author.class)
+                .block();
+
+
+         BookInfo bookInfo = new BookInfo();
+         bookInfo.setBookInfo(book.getBookInfo());
+         bookInfo.setBookId(bookItem.getBookId());
+
+         bookInfo =  webClientBuilder.build()
+                .post()
+                .uri("http://localhost:8030/book_info/")
+                .bodyValue(bookInfo)
+                .retrieve()
+                .bodyToMono(BookInfo.class)
+                .block();
+        return  ResponseEntity.ok(new Book(book.getName(),bookInfo.getBookInfo(),author.getAuthorName()));
     }
 
 
