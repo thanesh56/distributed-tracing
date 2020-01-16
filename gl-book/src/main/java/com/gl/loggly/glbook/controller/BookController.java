@@ -87,4 +87,43 @@ public class BookController {
         return  ResponseEntity.ok(new Book(book.getName(),bookInfo.getBookInfo(),author.getAuthorName()));
     }
 
+
+    @PutMapping(path = "/")
+    public ResponseEntity<Book> updateBook(@RequestBody Book book){
+        Long bookId = bookDao.getBookIdByBookName(book.getName());
+
+
+        BookItem bookItem = new BookItem();
+        bookItem.setBookId(bookId);
+        bookItem.setBookName(book.getName());
+        bookItem = bookDao.updateBookItem(bookItem);
+
+
+        Author author = new Author();
+        author.setAuthorName(book.getAuthor());
+        author.setBookId(bookItem.getBookId());
+
+        author =  webClientBuilder.build()
+                .put()
+                .uri("http://localhost:8020/author/")
+                .bodyValue( author)
+                .retrieve()
+                .bodyToMono(Author.class)
+                .block();
+
+
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setBookInfo(book.getBookInfo());
+        bookInfo.setBookId(bookItem.getBookId());
+
+        bookInfo =  webClientBuilder.build()
+                .put()
+                .uri("http://localhost:8030/book_info/")
+                .bodyValue(bookInfo)
+                .retrieve()
+                .bodyToMono(BookInfo.class)
+                .block();
+        return  ResponseEntity.ok(new Book(book.getName(),bookInfo.getBookInfo(),author.getAuthorName()));
+    }
+
 }

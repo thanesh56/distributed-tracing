@@ -22,4 +22,21 @@ public class BookDaoImpl implements BookDao {
     public BookItem saveBookItem(BookItem bookItem) {
         return bookRepository.save(bookItem);
     }
+
+    @Override
+    public BookItem updateBookItem(BookItem bookItem) {
+        return bookRepository.save(bookItem);
+    }
+
+    @Override
+    public void deleteBookItemById(long bookId) {
+        bookRepository.deleteById(bookId);
+
+    }
+
+    @Override
+    public void deleteAllBookItem() {
+        bookRepository.deleteAll();
+
+    }
 }

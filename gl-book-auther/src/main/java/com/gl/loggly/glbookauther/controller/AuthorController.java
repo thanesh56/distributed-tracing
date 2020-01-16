@@ -30,4 +30,15 @@ public class AuthorController {
         return authorDao.saveAuthor(newAuthor);
 
     }
+
+
+    @PostMapping(path = "/")
+    public Author updateAuthor(@RequestBody Author author){
+        Author newAuthor = new Author();
+        newAuthor.setAuthorId();
+        newAuthor.setAuthorName(author.getAuthorName());
+        newAuthor.setBookId(author.getBookId());
+        return authorDao.saveAuthor(newAuthor);
+
+    }
 }
