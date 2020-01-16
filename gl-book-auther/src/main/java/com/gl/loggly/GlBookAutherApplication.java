@@ -1,13 +1,13 @@
-package com.gl.loggly.glbookinfo;
+package com.gl.loggly;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GlBookInfoApplication {
+public class GlBookAutherApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GlBookInfoApplication.class, args);
+		SpringApplication.run(GlBookAutherApplication.class, args);
 	}
 
 }
