@@ -7,20 +7,19 @@
 		<artifactId>gl-loggly</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>gl-book-auther</artifactId>
+	<packaging>jar</packaging>
+	<artifactId>gl-loggly-interceptor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gl-book-auther</name>
-	<description>A microservice which return a book auther</description>
+	<name>gl-loggly-interceptor</name>
+	<description>A component with intercept the request</description>
 
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
-
 	<dependencies>
 		<dependency>
-			<groupId>com.gl.loggly</groupId>
-			<artifactId>gl-loggly-interceptor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 	</dependencies>
 
