@@ -6,4 +6,8 @@ public interface BookInfoDao {
     BookInfo getBookInfoByBookId(long id);
 
     BookInfo saveBookInfo(BookInfo bookInfo);
+
+    void deleteBookInfoByBookId(long id);
+
+    void deleteAllBookInfo();
 }

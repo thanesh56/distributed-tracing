@@ -126,4 +126,48 @@ public class BookController {
         return  ResponseEntity.ok(new Book(book.getName(),bookInfo.getBookInfo(),author.getAuthorName()));
     }
 
+
+    @DeleteMapping(path = "/{bookName}")
+    public ResponseEntity<String> deleteBook(@PathVariable(required = true)String bookName){
+        Long bookId = bookDao.getBookIdByBookName(bookName);
+        bookDao.deleteBookItemById(bookId);
+
+
+            webClientBuilder.build()
+                .delete()
+                .uri("http://localhost:8020/author/" + bookId)
+                .retrieve()
+                .bodyToMono(Author.class)
+                .block();
+
+            webClientBuilder.build()
+                .delete()
+                .uri("http://localhost:8030/book_info/" +bookId)
+                .retrieve()
+                .bodyToMono(BookInfo.class)
+                .block();
+        return  ResponseEntity.ok(" "+ bookName+" deleted successfully");
+    }
+
+    @DeleteMapping(path = "/")
+    public ResponseEntity<String> deleteAllBook(){
+        bookDao.deleteAllBookItem();
+
+
+            webClientBuilder.build()
+                .delete()
+                .uri("http://localhost:8020/author/" )
+                .retrieve()
+                .bodyToMono(Author.class)
+                .block();
+
+            webClientBuilder.build()
+                .delete()
+                .uri("http://localhost:8030/book_info/")
+                .retrieve()
+                .bodyToMono(BookInfo.class)
+                .block();
+        return  ResponseEntity.ok("All Book deleted successfully");
+    }
+
 }

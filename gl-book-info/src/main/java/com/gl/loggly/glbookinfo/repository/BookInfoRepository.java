@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface BookInfoRepository extends MongoRepository<BookInfo,Long> {
 
     BookInfo findBookInfoByBookId(long id);
+    void deleteByBookId(long id);
 }

@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface AuthorRepository extends MongoRepository<Author,Long> {
 
     Author findAuthorByBookId(long id);
+    void deleteByBookId(long id);
 }

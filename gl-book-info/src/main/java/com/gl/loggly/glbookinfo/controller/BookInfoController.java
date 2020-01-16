@@ -30,4 +30,24 @@ public class BookInfoController {
         return bookInfoDao.saveBookInfo(newBookInfo);
 
     }
+
+    @PutMapping(path = "/")
+    public BookInfo updateBookInfo(@RequestBody BookInfo bookInfo){
+        BookInfo newBookInfo = new BookInfo();
+        newBookInfo.setBookInfoId(bookInfoDao.getBookInfoByBookId(bookInfo.getBookId()).getBookInfoId());
+        newBookInfo.setBookInfo(bookInfo.getBookInfo());
+        newBookInfo.setBookId(bookInfo.getBookId());
+        return bookInfoDao.saveBookInfo(newBookInfo);
+
+    }
+
+    @DeleteMapping(path = "/{bookId}")
+    public void deleteBookInfoByBookId(@PathVariable(required = true)long bookId){
+         bookInfoDao.getBookInfoByBookId(bookId);
+    }
+
+    @DeleteMapping(path = "/")
+    public void deleteAllBookInfo(){
+        bookInfoDao.deleteAllBookInfo();
+    }
 }

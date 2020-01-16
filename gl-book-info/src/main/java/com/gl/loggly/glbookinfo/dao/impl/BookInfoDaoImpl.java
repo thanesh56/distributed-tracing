@@ -19,4 +19,15 @@ public class BookInfoDaoImpl implements BookInfoDao {
     public BookInfo saveBookInfo(BookInfo bookInfo) {
         return bookInfoRepository.save(bookInfo);
     }
+
+    @Override
+    public void deleteBookInfoByBookId(long id) {
+        bookInfoRepository.deleteByBookId(id);
+    }
+
+    @Override
+    public void deleteAllBookInfo() {
+        bookInfoRepository.deleteAll();
+
+    }
 }

@@ -21,4 +21,15 @@ public class AuthorDaoImpl implements AuthorDao {
     public Author saveAuthor(Author author) {
         return authorRepository.save(author);
     }
+
+    @Override
+    public void deleteAuthorByBookId(long id) {
+        authorRepository.deleteByBookId(id);
+    }
+
+    @Override
+    public void deleteAll() {
+        authorRepository.deleteAll();
+
+    }
 }

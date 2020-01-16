@@ -32,13 +32,24 @@ public class AuthorController {
     }
 
 
-    @PostMapping(path = "/")
+    @PutMapping(path = "/")
     public Author updateAuthor(@RequestBody Author author){
+
         Author newAuthor = new Author();
-        newAuthor.setAuthorId();
+        newAuthor.setAuthorId(authorDao.getAuthorByBookId(author.getBookId()).getAuthorId());
         newAuthor.setAuthorName(author.getAuthorName());
         newAuthor.setBookId(author.getBookId());
         return authorDao.saveAuthor(newAuthor);
 
+    }
+
+    @DeleteMapping(path = "/{bookId}")
+    public void deleteAuthorByBookId(@PathVariable(required = true)long bookId){
+         authorDao.deleteAuthorByBookId(bookId);
+    }
+
+    @DeleteMapping(path = "/")
+    public void deleteAllAuthorByBookId(){
+        authorDao.deleteAll();
     }
 }
