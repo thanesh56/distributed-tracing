@@ -2,15 +2,13 @@ package com.gl.loggly.glbook.service;
 
 import com.gl.loggly.glbook.constant.BookConstant;
 import com.gl.loggly.glbook.model.Author;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class AuthorService {
 
-    @Autowired
-    private WebClient.Builder webClientBuilder;//for communicating with another microservice
+    private final WebClient.Builder webClientBuilder;//for communicating with another microservice
 
     public AuthorService(WebClient.Builder webClientBuilder) {
         this.webClientBuilder = webClientBuilder;

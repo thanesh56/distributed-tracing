@@ -10,40 +10,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(BookInfoConstant.BOOK_INFO_URL)
 public class BookInfoController {
+    private final BookInfoDao bookInfoDao;
 
-    @Autowired
-    private BookInfoDao bookInfoDao;
-
-    @Autowired
-    private NextSequenceService nextSequenceService;
-
-    public BookInfoController(BookInfoDao bookInfoDao, NextSequenceService nextSequenceService) {
+    public BookInfoController(BookInfoDao bookInfoDao) {
         this.bookInfoDao = bookInfoDao;
-        this.nextSequenceService = nextSequenceService;
+
     }
 
     @GetMapping(path = BookInfoConstant.GET_BOOK_INFO_BY_BOOK_ID_URL)
-    public BookInfo getBookInfoByBookId(@PathVariable(required = true)long bookId){
+    public BookInfo getBookInfoByBookId(@PathVariable long bookId){
         return bookInfoDao.getBookInfoByBookId(bookId);
     }
 
     @PostMapping(path = BookInfoConstant.SAVE_BOOK_INFO_URL)
     public BookInfo addBookInfo(@RequestBody BookInfo bookInfo){
-        BookInfo newBookInfo = new BookInfo();
-        newBookInfo.setBookInfoId(nextSequenceService.getNextSequence("bookInfoCustomSequences"));
-        newBookInfo.setBookInfo(bookInfo.getBookInfo());
-        newBookInfo.setBookId(bookInfo.getBookId());
-        return bookInfoDao.saveBookInfo(newBookInfo);
+        return bookInfoDao.saveBookInfo(bookInfo);
 
     }
 
     @PutMapping(path = BookInfoConstant.UPDATE_BOOK_INFO_URL)
     public BookInfo updateBookInfo(@RequestBody BookInfo bookInfo){
-        BookInfo newBookInfo = new BookInfo();
-        newBookInfo.setBookInfoId(bookInfoDao.getBookInfoByBookId(bookInfo.getBookId()).getBookInfoId());
-        newBookInfo.setBookInfo(bookInfo.getBookInfo());
-        newBookInfo.setBookId(bookInfo.getBookId());
-        return bookInfoDao.saveBookInfo(newBookInfo);
+        return bookInfoDao.updateBookInfo(bookInfo);
 
     }
 

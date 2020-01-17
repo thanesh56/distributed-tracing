@@ -10,4 +10,6 @@ public interface BookInfoDao {
     void deleteBookInfoByBookId(long id);
 
     void deleteAllBookInfo();
+
+    BookInfo updateBookInfo(BookInfo bookInfo);
 }

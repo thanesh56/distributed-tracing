@@ -10,19 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(AuthorConstant.AUTHOR_URL)
 public class AuthorController {
+    private final AuthorDao authorDao;
 
-    @Autowired
-    private AuthorDao authorDao;
-
-    @Autowired
-    private NextSequenceService nextSequenceService;
-
-    public AuthorController(AuthorDao authorDao, NextSequenceService nextSequenceService) {
+    public AuthorController(AuthorDao authorDao) {
         this.authorDao = authorDao;
-        this.nextSequenceService = nextSequenceService;
     }
-
-
 
 
     @GetMapping(path = AuthorConstant.GET_AUTHOR_BY_BOOK_ID_URL )
@@ -30,26 +22,16 @@ public class AuthorController {
         return authorDao.getAuthorByBookId(bookId);
     }
 
+
     @PostMapping(path = AuthorConstant.SAVE_AUTHOR_URL)
     public Author saveAuthor(@RequestBody Author author){
-        Author newAuthor = new Author();
-        newAuthor.setAuthorId(nextSequenceService.getNextSequence("authorCustomSequences"));
-        newAuthor.setAuthorName(author.getAuthorName());
-        newAuthor.setBookId(author.getBookId());
-        return authorDao.saveAuthor(newAuthor);
-
+        return authorDao.saveAuthor(author);
     }
 
 
     @PutMapping(path = AuthorConstant.UPDATE_AUTHOR_URL)
     public Author updateAuthor(@RequestBody Author author){
-
-        Author newAuthor = new Author();
-        newAuthor.setAuthorId(authorDao.getAuthorByBookId(author.getBookId()).getAuthorId());
-        newAuthor.setAuthorName(author.getAuthorName());
-        newAuthor.setBookId(author.getBookId());
-        return authorDao.saveAuthor(newAuthor);
-
+        return authorDao.updateAuthor(author);
     }
 
     @DeleteMapping(path = AuthorConstant.DELETE_AUTHOR)

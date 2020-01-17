@@ -3,13 +3,19 @@ package com.gl.loggly.glbookauther.dao.impl;
 import com.gl.loggly.glbookauther.dao.AuthorDao;
 import com.gl.loggly.glbookauther.model.Author;
 import com.gl.loggly.glbookauther.repository.AuthorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.gl.loggly.glbookauther.service.NextSequenceService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorDaoImpl implements AuthorDao {
-    @Autowired
-    AuthorRepository authorRepository;
+
+    private final AuthorRepository authorRepository;
+    private final NextSequenceService nextSequenceService;
+
+    public AuthorDaoImpl(AuthorRepository authorRepository, NextSequenceService nextSequenceService) {
+        this.authorRepository = authorRepository;
+        this.nextSequenceService = nextSequenceService;
+    }
 
 
     @Override
@@ -19,6 +25,13 @@ public class AuthorDaoImpl implements AuthorDao {
 
     @Override
     public Author saveAuthor(Author author) {
+        author.setAuthorId(nextSequenceService.getNextSequence("authorCustomSequences"));
+        return authorRepository.save(author);
+    }
+
+    @Override
+    public Author updateAuthor(Author author) {
+        author.setAuthorId(authorRepository.findAuthorByBookId(author.getBookId()).getAuthorId());
         return authorRepository.save(author);
     }
 
@@ -32,4 +45,5 @@ public class AuthorDaoImpl implements AuthorDao {
         authorRepository.deleteAll();
 
     }
+
 }
