@@ -1,5 +1,6 @@
 package com.gl.loggly.glbookinfo.controller;
 
+import com.gl.loggly.glbookinfo.constant.BookInfoConstant;
 import com.gl.loggly.glbookinfo.dao.BookInfoDao;
 import com.gl.loggly.glbookinfo.model.BookInfo;
 import com.gl.loggly.glbookinfo.service.NextSequenceService;
@@ -7,21 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/book_info")
+@RequestMapping(BookInfoConstant.BOOK_INFO_URL)
 public class BookInfoController {
 
     @Autowired
-    BookInfoDao bookInfoDao;
+    private BookInfoDao bookInfoDao;
 
     @Autowired
-    NextSequenceService nextSequenceService;
+    private NextSequenceService nextSequenceService;
 
-    @GetMapping(path = "/{bookId}")
+    public BookInfoController(BookInfoDao bookInfoDao, NextSequenceService nextSequenceService) {
+        this.bookInfoDao = bookInfoDao;
+        this.nextSequenceService = nextSequenceService;
+    }
+
+    @GetMapping(path = BookInfoConstant.GET_BOOK_INFO_BY_BOOK_ID_URL)
     public BookInfo getBookInfoByBookId(@PathVariable(required = true)long bookId){
         return bookInfoDao.getBookInfoByBookId(bookId);
     }
 
-    @PostMapping(path = "/")
+    @PostMapping(path = BookInfoConstant.SAVE_BOOK_INFO_URL)
     public BookInfo addBookInfo(@RequestBody BookInfo bookInfo){
         BookInfo newBookInfo = new BookInfo();
         newBookInfo.setBookInfoId(nextSequenceService.getNextSequence("bookInfoCustomSequences"));
@@ -31,7 +37,7 @@ public class BookInfoController {
 
     }
 
-    @PutMapping(path = "/")
+    @PutMapping(path = BookInfoConstant.UPDATE_BOOK_INFO_URL)
     public BookInfo updateBookInfo(@RequestBody BookInfo bookInfo){
         BookInfo newBookInfo = new BookInfo();
         newBookInfo.setBookInfoId(bookInfoDao.getBookInfoByBookId(bookInfo.getBookId()).getBookInfoId());
@@ -41,12 +47,12 @@ public class BookInfoController {
 
     }
 
-    @DeleteMapping(path = "/{bookId}")
+    @DeleteMapping(path = BookInfoConstant.DELETE_BOOK_INFO)
     public void deleteBookInfoByBookId(@PathVariable(required = true)long bookId){
          bookInfoDao.getBookInfoByBookId(bookId);
     }
 
-    @DeleteMapping(path = "/")
+    @DeleteMapping(path = BookInfoConstant.DELETE_ALL_BOOK_INFO_URL)
     public void deleteAllBookInfo(){
         bookInfoDao.deleteAllBookInfo();
     }

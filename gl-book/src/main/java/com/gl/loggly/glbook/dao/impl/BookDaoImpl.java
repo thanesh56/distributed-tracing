@@ -6,6 +6,8 @@ import com.gl.loggly.glbook.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookDaoImpl implements BookDao {
 
@@ -19,12 +21,12 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public BookItem saveBookItem(BookItem bookItem) {
-        return bookRepository.save(bookItem);
+    public List<BookItem> getAllBook() {
+        return bookRepository.findAll();
     }
 
     @Override
-    public BookItem updateBookItem(BookItem bookItem) {
+    public BookItem saveUpdateBookItem(BookItem bookItem) {
         return bookRepository.save(bookItem);
     }
 

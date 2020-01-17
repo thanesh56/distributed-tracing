@@ -1,5 +1,6 @@
 package com.gl.loggly.glbook.controller;
 
+import com.gl.loggly.glbook.constant.BookConstant;
 import com.gl.loggly.glbook.dao.BookDao;
 import com.gl.loggly.glbook.model.Author;
 import com.gl.loggly.glbook.model.Book;
@@ -8,42 +9,48 @@ import com.gl.loggly.glbook.model.BookItem;
 import com.gl.loggly.glbook.service.NextSequenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping(BookConstant.BOOK_URL)
 public class BookController {
     @Autowired
-    BookDao bookDao;
+    private BookDao bookDao;
 
     @Autowired
-    NextSequenceService nextSequenceService;
+    private NextSequenceService nextSequenceService;
 
     @Autowired
-    WebClient.Builder webClientBuilder;     //for communicating with another microservice
+    private WebClient.Builder webClientBuilder;     //for communicating with another microservice
 
-    @GetMapping(path = "/{bookName}")
+    public BookController(BookDao bookDao, NextSequenceService nextSequenceService, WebClient.Builder webClientBuilder) {
+        this.bookDao = bookDao;
+        this.nextSequenceService = nextSequenceService;
+        this.webClientBuilder = webClientBuilder;
+    }
+
+
+
+    @GetMapping(path = BookConstant.GET_BOOK_BY_NAME_URL)
     public ResponseEntity<Book> getBookByName(@PathVariable(required = true)String bookName){
         Long bookId = bookDao.getBookIdByBookName(bookName);
 
         Author author =  webClientBuilder.build()
                 .get()
-                .uri("http://localhost:8020/author/" + bookId)
+                .uri(BookConstant.BOOK_AUTHOR_URL + bookId)
                 .retrieve()
                 .bodyToMono(Author.class)
                 .block();
 
         BookInfo bookInfo =  webClientBuilder.build()
                 .get()
-                .uri("http://localhost:8030/book_info/" +bookId)
+                .uri(BookConstant.BOOK_INFO_URL +bookId)
                 .retrieve()
                 .bodyToMono(BookInfo.class)
                 .block();
@@ -52,12 +59,38 @@ public class BookController {
 
 
 
-    @PostMapping(path = "/")
+    @GetMapping(path = BookConstant.GET_ALL_BOOK_URL)
+    public ResponseEntity<List<Book>> getAllBook(){
+        List<BookItem> bookItems = bookDao.getAllBook();
+        List<Book> books = bookItems.stream().map(bookItem -> {
+            Author author = webClientBuilder.build()
+                    .get()
+                    .uri(BookConstant.BOOK_AUTHOR_URL + bookItem.getBookId())
+                    .retrieve()
+                    .bodyToMono(Author.class)
+                    .block();
+            BookInfo bookInfo =  webClientBuilder.build()
+                    .get()
+                    .uri(BookConstant.BOOK_INFO_URL +bookItem.getBookId())
+                    .retrieve()
+                    .bodyToMono(BookInfo.class)
+                    .block();
+            return  new Book(bookItem.getBookName(),bookInfo.getBookInfo(),author.getAuthorName());
+
+        })
+        .collect(Collectors.toList());
+
+        return ResponseEntity.ok(books);
+    }
+
+
+
+    @PostMapping(path = BookConstant.SAVE_BOOK_URL)
     public ResponseEntity<Book> addBook(@RequestBody Book book){
         BookItem bookItem = new BookItem();
         bookItem.setBookId(nextSequenceService.getNextSequence("bookCustomSequences"));
         bookItem.setBookName(book.getName());
-        bookItem = bookDao.saveBookItem(bookItem);
+        bookItem = bookDao.saveUpdateBookItem(bookItem);
 
 
         Author author = new Author();
@@ -66,7 +99,7 @@ public class BookController {
 
          author =  webClientBuilder.build()
                 .post()
-                .uri("http://localhost:8020/author/")
+                .uri(BookConstant.BOOK_AUTHOR_URL)
                 .bodyValue( author)
                 .retrieve()
                 .bodyToMono(Author.class)
@@ -79,7 +112,7 @@ public class BookController {
 
          bookInfo =  webClientBuilder.build()
                 .post()
-                .uri("http://localhost:8030/book_info/")
+                .uri(BookConstant.BOOK_INFO_URL)
                 .bodyValue(bookInfo)
                 .retrieve()
                 .bodyToMono(BookInfo.class)
@@ -88,7 +121,7 @@ public class BookController {
     }
 
 
-    @PutMapping(path = "/")
+    @PutMapping(path = BookConstant.UPDATE_BOOK_URL)
     public ResponseEntity<Book> updateBook(@RequestBody Book book){
         Long bookId = bookDao.getBookIdByBookName(book.getName());
 
@@ -96,7 +129,7 @@ public class BookController {
         BookItem bookItem = new BookItem();
         bookItem.setBookId(bookId);
         bookItem.setBookName(book.getName());
-        bookItem = bookDao.updateBookItem(bookItem);
+        bookItem = bookDao.saveUpdateBookItem(bookItem);
 
 
         Author author = new Author();
@@ -105,7 +138,7 @@ public class BookController {
 
         author =  webClientBuilder.build()
                 .put()
-                .uri("http://localhost:8020/author/")
+                .uri(BookConstant.BOOK_AUTHOR_URL)
                 .bodyValue( author)
                 .retrieve()
                 .bodyToMono(Author.class)
@@ -118,7 +151,7 @@ public class BookController {
 
         bookInfo =  webClientBuilder.build()
                 .put()
-                .uri("http://localhost:8030/book_info/")
+                .uri(BookConstant.BOOK_INFO_URL)
                 .bodyValue(bookInfo)
                 .retrieve()
                 .bodyToMono(BookInfo.class)
@@ -127,7 +160,7 @@ public class BookController {
     }
 
 
-    @DeleteMapping(path = "/{bookName}")
+    @DeleteMapping(path = BookConstant.DELETE_BOOK)
     public ResponseEntity<String> deleteBook(@PathVariable(required = true)String bookName){
         Long bookId = bookDao.getBookIdByBookName(bookName);
         bookDao.deleteBookItemById(bookId);
@@ -135,35 +168,35 @@ public class BookController {
 
             webClientBuilder.build()
                 .delete()
-                .uri("http://localhost:8020/author/" + bookId)
+                .uri(BookConstant.BOOK_AUTHOR_URL + bookId)
                 .retrieve()
                 .bodyToMono(Author.class)
                 .block();
 
             webClientBuilder.build()
                 .delete()
-                .uri("http://localhost:8030/book_info/" +bookId)
+                .uri(BookConstant.BOOK_INFO_URL +bookId)
                 .retrieve()
                 .bodyToMono(BookInfo.class)
                 .block();
         return  ResponseEntity.ok(" "+ bookName+" deleted successfully");
     }
 
-    @DeleteMapping(path = "/")
+    @DeleteMapping(path = BookConstant.DELETE_ALL_BOOK_URL)
     public ResponseEntity<String> deleteAllBook(){
         bookDao.deleteAllBookItem();
 
 
             webClientBuilder.build()
                 .delete()
-                .uri("http://localhost:8020/author/" )
+                .uri(BookConstant.BOOK_AUTHOR_URL )
                 .retrieve()
                 .bodyToMono(Author.class)
                 .block();
 
             webClientBuilder.build()
                 .delete()
-                .uri("http://localhost:8030/book_info/")
+                .uri(BookConstant.BOOK_INFO_URL)
                 .retrieve()
                 .bodyToMono(BookInfo.class)
                 .block();
